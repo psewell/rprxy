@@ -54,6 +54,19 @@ function getSubdomain (req, rewrite) {
   return sub;
 }
 
+function getProxyTarget (req) {
+  var seenHeader = false;
+  for (key in req.rawHeaders) {
+    var header = req.rawHeaders[key]
+    if (seenHeader) {
+      return header;
+    } else if (header == "Proxy-Target") {
+      seenHeader = true;
+    }
+  }
+  return "www.roblox.com"
+}
+
 function onProxyError (err, req, res) {
   console.error(err);
 
@@ -106,6 +119,7 @@ app.use(function (req, res, next) {
 });
 
 app.use(function (req, res, next) {
+  req.headers.host = getProxyTarget(req)
   console.log('PROXY REQUEST; HOST: ' + req.headers.host + '; URL: ' + req.url + '; OPT: ' + req.body + '; COOKIE: ' + req.headers.cookie + ';');
   var subdomain = getSubdomain(req, true);
   var proto = subdomain === 'wiki.' ? 'http' : 'https';

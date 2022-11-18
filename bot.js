@@ -1,3 +1,5 @@
+const inGameTag = "1037058919899615262"
+
 const fetchAll = require('./fetchAll.js');
 const axios = require('axios');
 const Promise = require('promise');
@@ -36,10 +38,13 @@ function publishMessage (msg) {
 
 function addThreadPins (threads, results, promises) {
   for (var thread of threads) {
-    if (thread.appliedTags.find(item => item == "1037058919899615262")) {
+    if (thread.appliedTags.find(item => item == inGameTag)) {
       promises.push(thread.messages.fetchPinned().then(pinned => {
         for (var pin of pinned) {
-          results.push(pin[1].content);
+          results.push({
+            id: pin[1].content.match(/\d+/)[0],
+            tags: thread.appliedTags,
+          });
         };
       }));
     };
@@ -47,7 +52,6 @@ function addThreadPins (threads, results, promises) {
 }
 
 router.get('/bot/', function (req, res, next) {
-  console.log("Request");
   client.channels.fetch(process.env.CHANNEL_ID).then(channel => {
     var results = new Array();
     var promises = new Array();

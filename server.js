@@ -1,3 +1,6 @@
+// Refresh bot commands
+require('./deploy-commands.js');
+
 var proxy = require('http-proxy');
 var express = require('express');
 var https = require('https');

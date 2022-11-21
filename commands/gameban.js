@@ -34,7 +34,7 @@ function readBannedPlayers () {
     {
       params: {
         datastoreName: "BanList",
-        scope: "V3",
+        scope: "V2",
         entryKey: "BanList",
       },
       headers: {
@@ -50,7 +50,7 @@ function setBannedPlayers (response) {
     {
       params: {
         datastoreName: "BanList",
-        scope: "V3",
+        scope: "V2",
         entryKey: "BanList",
       },
       headers: {

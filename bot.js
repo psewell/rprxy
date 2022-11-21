@@ -58,14 +58,22 @@ client.on(Events.InteractionCreate, async interaction => {
 // Log in to Discord with your client's token
 client.login(process.env.TOKEN);
 
-function addMapInfo (threads, results, promises) {
+function addMapInfo (threads, results, promises, availableTags) {
   for (var thread of threads) {
     if (thread.appliedTags.find(item => item == inGameTag)) {
+      const data = {
+        name: thread.name,
+        tags: thread.appliedTags,
+      }
       promises.push(thread.messages.fetchPinned().then(pinned => {
         for (var pin of pinned) {
+          var tags = availableTags.filter(item => {
+            return data.tags.find(tag => item.id == tag) != null;
+          })
           results.push({
             id: pin[1].content.match(/\d+/)[0],
-            tags: thread.appliedTags,
+            name: data.name,
+            tags: tags,
           });
         };
       }));
@@ -75,14 +83,15 @@ function addMapInfo (threads, results, promises) {
 
 router.get('/bot/maps', function (req, res, next) {
   client.channels.fetch(process.env.CHANNEL_ID).then(channel => {
+    const availableTags = channel.availableTags;
     var results = new Array();
     var promises = new Array();
     var fetch = new Array();
     fetch.push(fetchAll(channel, false).then(threads => {
-      addMapInfo(threads, results, promises);
+      addMapInfo(threads, results, promises, availableTags);
     }).catch(console.error));
     fetch.push(fetchAll(channel, true).then(threads => {
-      addMapInfo(threads, results, promises);
+      addMapInfo(threads, results, promises, availableTags);
     }).catch(console.error));
     Promise.all(fetch).then(() => {
       Promise.all(promises).then(() => res.end(JSON.stringify(results)));

@@ -1,17 +1,22 @@
 {
-  "name": "rprxy",
-  "version": "1.0.1",
+  "name": "nodejs",
+  "version": "1.0.0",
   "description": "",
-  "main": "server.js",
+  "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "keywords": [],
   "author": "",
-  "license": "MIT",
+  "license": "ISC",
   "dependencies": {
-    "cheerio": "^1.0.0-rc.2",
-    "express": "^4.15.3",
-    "http-proxy": "^1.16.2"
+    "@types/node": "^18.0.6",
+    "axios": "^1.1.3",
+    "cheerio": "^1.0.0-rc.12",
+    "discord.js": "^14.6.0",
+    "express": "^4.18.2",
+    "http-proxy": "^1.18.1",
+    "node-fetch": "^3.2.6",
+    "promise": "^8.3.0"
   }
 }

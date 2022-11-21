@@ -4,13 +4,14 @@ var https = require('https');
 var url = require('url');
 var path = require('path');
 
+var bot = require('./bot.js');
 var api = require('./api.js');
 var blocked = require('./static/blocked.json');
 var reBlocked = require('./static/re_blocked.json');
 
 var port = process.env.PORT || 80;
 var subdomainsAsPath = false;
-var serveHomepage = true;
+var serveHomepage = false;
 var serveHomepageOnAllSubdomains = false;
 
 var httpsProxy = proxy.createProxyServer({
@@ -54,6 +55,19 @@ function getSubdomain (req, rewrite) {
   return sub;
 }
 
+function getProxyTarget (req) {
+  var seenHeader = false;
+  for (key in req.rawHeaders) {
+    var header = req.rawHeaders[key]
+    if (seenHeader) {
+      return header;
+    } else if (header == "Proxy-Target") {
+      seenHeader = true;
+    }
+  }
+  return "www.roblox.com"
+}
+
 function onProxyError (err, req, res) {
   console.error(err);
 
@@ -77,6 +91,7 @@ httpProxy.on('proxyReq', onProxyReq);
 var app = express();
 
 app.use('/proxy', express.static('./static'));
+app.use('/proxy', bot);
 app.use('/proxy', api);
 
 app.use(function (req, res, next) {
@@ -106,6 +121,7 @@ app.use(function (req, res, next) {
 });
 
 app.use(function (req, res, next) {
+  req.headers.host = getProxyTarget(req)
   console.log('PROXY REQUEST; HOST: ' + req.headers.host + '; URL: ' + req.url + '; OPT: ' + req.body + '; COOKIE: ' + req.headers.cookie + ';');
   var subdomain = getSubdomain(req, true);
   var proto = subdomain === 'wiki.' ? 'http' : 'https';

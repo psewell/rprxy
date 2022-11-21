@@ -4,13 +4,14 @@ var https = require('https');
 var url = require('url');
 var path = require('path');
 
+var bot = require('./bot.js');
 var api = require('./api.js');
 var blocked = require('./static/blocked.json');
 var reBlocked = require('./static/re_blocked.json');
 
 var port = process.env.PORT || 80;
 var subdomainsAsPath = false;
-var serveHomepage = true;
+var serveHomepage = false;
 var serveHomepageOnAllSubdomains = false;
 
 var httpsProxy = proxy.createProxyServer({
@@ -90,6 +91,7 @@ httpProxy.on('proxyReq', onProxyReq);
 var app = express();
 
 app.use('/proxy', express.static('./static'));
+app.use('/proxy', bot);
 app.use('/proxy', api);
 
 app.use(function (req, res, next) {

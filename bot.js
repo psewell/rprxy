@@ -3,11 +3,9 @@ const inGameTag = "1037058919899615262"
 const fs = require('node:fs');
 const path = require('node:path');
 const fetchAll = require('./fetchAll.js');
-const axios = require('axios');
 const Promise = require('promise');
 var express = require('express');
 var router = express.Router();
-var url = "https://apis.roblox.com/messaging-service/v1/universes/" + process.env.UNIVERSE_ID + "/topics/" + process.env.TOPIC;
 
 // Require the necessary discord.js classes
 const { Client, Collection, Events, GatewayIntentBits } = require('discord.js');
@@ -50,28 +48,17 @@ client.on(Events.InteractionCreate, async interaction => {
 		await command.execute(interaction);
 	} catch (error) {
 		console.error(error);
-		await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+		await interaction.reply({
+      content: 'There was an error while executing this command!',
+      ephemeral: true
+    });
 	}
 });
 
 // Log in to Discord with your client's token
 client.login(process.env.TOKEN);
 
-function publishMessage (msg) {
-  axios.post(url,
-    {
-       message: msg,
-    },
-    {
-      headers: {
-        'x-api-key': process.env.MESSAGE_KEY,
-        'Content-Type': 'application/json',
-      },
-    }
-  );
-};
-
-function addThreadPins (threads, results, promises) {
+function addMapInfo (threads, results, promises) {
   for (var thread of threads) {
     if (thread.appliedTags.find(item => item == inGameTag)) {
       promises.push(thread.messages.fetchPinned().then(pinned => {
@@ -92,10 +79,10 @@ router.get('/bot/maps', function (req, res, next) {
     var promises = new Array();
     var fetch = new Array();
     fetch.push(fetchAll(channel, false).then(threads => {
-      addThreadPins(threads, results, promises);
+      addMapInfo(threads, results, promises);
     }).catch(console.error));
     fetch.push(fetchAll(channel, true).then(threads => {
-      addThreadPins(threads, results, promises);
+      addMapInfo(threads, results, promises);
     }).catch(console.error));
     Promise.all(fetch).then(() => {
       Promise.all(promises).then(() => res.end(JSON.stringify(results)));

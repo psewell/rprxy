@@ -77,11 +77,11 @@ function publishMessage (msg) {
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('gameban')
-		.setDescription('Bans a user from Framed.')
+		.setName('unban')
+		.setDescription('Unbans a user from Framed.')
     .addSubcommand((subcommand) => subcommand
       .setName('userid')
-      .setDescription('Input the user id of the player to ban.')
+      .setDescription('Input the user id of the player to unban.')
       .addIntegerOption((option) => option
         .setName('userid')
         .setRequired(true)
@@ -90,12 +90,12 @@ module.exports = {
       .addStringOption((option) => option
         .setName('reason')
         .setRequired(true)
-        .setDescription('The reason for the ban.')
+        .setDescription('The reason for the unban.')
       )
     )
     .addSubcommand((subcommand) => subcommand
       .setName('username')
-      .setDescription('Input the username of the player to ban.')
+      .setDescription('Input the username of the player to unban.')
       .addStringOption((option) => option
         .setName('username')
         .setRequired(true)
@@ -104,7 +104,7 @@ module.exports = {
       .addStringOption((option) => option
         .setName('reason')
         .setRequired(true)
-        .setDescription('The reason for the ban.')
+        .setDescription('The reason for the unban.')
       )
     ),
 	async execute(interaction) {
@@ -128,28 +128,25 @@ module.exports = {
         return;
       }
       const reason = interaction.options.getString("reason");
-      if (trustedUsers.find(item => item == String(userId))) {
-        interaction.editReply('Cannot ban a trusted user.');
-        return;
-      }
       var encoded = base64(userId);
       var response = await readBannedPlayers();
       if (response.status == 200) {
         var values = response.data.split("-");
-        if (values.find(item => item == encoded)) {
-          interaction.editReply(userName + " is already banned.");
+        if (!values.find(item => item == encoded)) {
+          interaction.editReply(userName + " is not banned.");
           return;
         }
         values = values.filter(item => {
           return item != "." + encoded
         })
-        values.push(encoded);
+        var index = values.indexOf(encoded)
+        values[index] = "." + encoded
         response = values.join("-");
         response = await setBannedPlayers(response);
         if (response.status == 200) {
           await publishMessage("Remote");
           await postLogEmbed(interaction.client, {
-            action: "ban",
+            action: "unban",
             userName: userName,
             userId: userId,
             displayName: displayName,
@@ -159,7 +156,7 @@ module.exports = {
           interaction.editReply({
             embeds: [{
               type: "rich",
-              description: "Banned user " + displayName + ".",
+              description: "Unbanned user " + displayName + ".",
               fields: [
                 {
                   name: "UserId",

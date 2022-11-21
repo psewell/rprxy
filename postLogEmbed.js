@@ -1,7 +1,7 @@
 // Log channel
-//const channelId = "801554843843952650"
+const channelId = "801554843843952650"
 // Commands channel
-const channelId = "1044345266544840764"
+//const channelId = "1044345266544840764"
 
 const colors = {
   ban: 0x1490e3,

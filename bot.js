@@ -99,4 +99,29 @@ router.get('/bot/maps', function (req, res, next) {
   });
 });
 
+function isChangelogHeader (line) {
+  return line.match("Framed!") != null && line.match("Update") != null;
+}
+
+router.get('/bot/changelog', function (req, res, next) {
+  client.channels.fetch(process.env.ANNOUNCE_ID).then(channel => {
+    return channel.messages.fetch({
+      limit: 10,
+    }).then(messages => {
+      messages = messages.filter(message => {
+        const content = message.cleanContent;
+        const lines = content.split('\n');
+        return isChangelogHeader(lines[0]) || isChangelogHeader(lines[1]);
+      });
+      messages = messages.map(message => {
+        return {
+          content: message.cleanContent,
+          createdTimestamp: message.createdTimestamp,
+        };
+      });
+      res.end(JSON.stringify(messages));
+    }).catch(error => console.log(error));
+  });
+});
+
 module.exports = router;

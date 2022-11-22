@@ -4,8 +4,8 @@ const channelId = "801554843843952650"
 //const channelId = "1044345266544840764"
 
 const colors = {
-  ban: 0x1490e3,
-  kick: 0x1490e3,
+  ban: 0x8716e4,
+  kick: 0x8716e4,
   unban: 0xffffff,
 }
 
@@ -28,7 +28,7 @@ function createEmbed (data) {
     url: "https://www.roblox.com/users/" + data.userId + "/profile",
     footer: {
       text: "Submitted by " + data.user.displayName,
-      icon_url: data.user.avatarURL(),
+      icon_url: data.user.displayAvatarURL(),
     },
     timestamp: new Date().toISOString(),
   }
